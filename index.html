@@ -307,7 +307,7 @@
   "use strict";
 
   /* ========== КОНФИГ ========== */
-  const OPENING_DATE = new Date(2026, 8, 21, 0, 0, 0); // 21 сентября 2026, 00:00
+  const OPENING_DATE = new Date(2026, 8, 22, 0, 0, 0); // 22 сентября 2026, 00:00
   const BASE_URL = "https://markbartolomeev-blip.github.io/tulenoween_ARG/";
   const IMG_AFTER_FRONT = "29722FF0-5127-4496-AB44-19FD50837348.jpeg";
   const IMG_AFTER_BACK  = "5804DA2B-A9FF-4168-9755-269AEDE9D162.jpeg";
@@ -330,7 +330,6 @@
   let opened = false;
 
   /* ========== ПРЕДЗАГРУЗКА КАРТИНОК ДЛЯ 3D ========== */
-  // Запускаем сразу, чтобы к моменту открытия всё уже было в кэше
   const preloadedFront = new Image();
   const preloadedBack  = new Image();
   preloadedFront.src = BASE_URL + IMG_AFTER_FRONT;
@@ -389,16 +388,13 @@
 
     clearInterval(timerInterval);
 
-    // Функция запуска 3D-сцены
     function show3D() {
       frontImg.src = preloadedFront.src;
       backImg.src  = preloadedBack.src;
 
-      // Плавно гасим старую картинку и плашку
       img.style.opacity = "0";
       glassPlate.classList.add("hidden");
 
-      // Через короткую паузу скрываем всё лишнее и включаем 3D
       setTimeout(() => {
         img.style.display = "none";
         pumpkin.style.display = "none";
@@ -409,8 +405,6 @@
       if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
     }
 
-    // Если картинки уже в кэше — показываем сразу,
-    // иначе ждём загрузки (и не показываем чёрный экран)
     if (preloadedFront.complete && preloadedBack.complete) {
       show3D();
     } else {
@@ -422,7 +416,6 @@
       if (preloadedFront.complete) loaded++; else preloadedFront.addEventListener("load", onOneLoaded, { once: true });
       if (preloadedBack.complete)  loaded++; else preloadedBack.addEventListener("load",  onOneLoaded, { once: true });
 
-      // Страховка: если что-то не загрузится за 5 секунд — показываем как есть
       setTimeout(() => {
         if (!flipScene.classList.contains("active")) show3D();
       }, 5000);
@@ -563,7 +556,6 @@
       pumpkin.classList.remove("show");
       timerDisplay.classList.remove("savetext");
 
-      // если за это время таймер уже истёк — не возвращаем текст
       if (!opened) {
         plateLabel.textContent = "До Открытия:";
         updateTimer();
@@ -572,11 +564,9 @@
     }, SECRET_DURATION);
   }
 
-  // Единый обработчик — pointerdown (работает и на мыши, и на тачскрине, без дублей)
   if (window.PointerEvent) {
     img.addEventListener("pointerdown", handleTap);
   } else {
-    // фолбэк для очень старых браузеров
     img.addEventListener("click", handleTap);
     img.addEventListener("touchstart", function (e) {
       e.preventDefault();
